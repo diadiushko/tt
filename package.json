@@ -1,0 +1,22 @@
+{
+  "name": "tt",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "npm run serve",
+    "serve": "nodemon src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "mongoose": "^7.5.3"
+  }
+}
