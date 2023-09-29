@@ -28,6 +28,7 @@ export const profileSchema = new Schema({
 
 // Hooks
 
+// After user's been deleted - delete all the order of theirs
 profileSchema.pre([...DELETE_OPERATIONS], async function () {
     const query = (this as Query<ProfileDocType, HydratedDocument<ProfileDocType>>);
     const user = await Profile.findOne(query.getFilter());

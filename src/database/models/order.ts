@@ -38,45 +38,15 @@ export const orderSchema = new Schema({
 
 // Hooks
 
+// Whenever an order's been saved/updated/deleted we remove the old quantity value from the product `quantity` field,
+// so we can add the new version after the operation.
 orderSchema.pre(
-    [...UPDATE_OPERATIONS, ...DELETE_OPERATIONS],
+    [...UPDATE_OPERATIONS, ...DELETE_OPERATIONS, ...BULK_UPDATE_OPERATIONS, ...BULK_DELETE_OPERATIONS],
     async function () {
         const query = (this as Query<ProfileDocType, HydratedDocument<ProfileDocType>>);
         if (!query?.getFilter?.()) {
             return;
         }
-        const order = await Order.findOne(query.getFilter());
-
-        if (!order) {
-            return;
-        }
-
-        await Promise.all(updateProductsQuantities(order?.products as OrderDocType['products'], true));
-    });
-
-orderSchema.post(
-    [...UPDATE_OPERATIONS],
-    async function (doc) {
-        const query = (this as Query<ProfileDocType, HydratedDocument<ProfileDocType>>);
-        if (doc?.products) {
-            return Promise.all(updateProductsQuantities(doc?.products as OrderDocType['products'], false));
-        }
-        if (!query.getFilter()) {
-            return;
-        }
-        const order = await Order.findOne(query.getFilter());
-
-        if (!order) {
-            return;
-        }
-
-        await Promise.all(updateProductsQuantities(order?.products as OrderDocType['products'], false));
-    });
-
-orderSchema.pre(
-    [...BULK_UPDATE_OPERATIONS, ...BULK_DELETE_OPERATIONS],
-    async function () {
-        const query = (this as Query<ProfileDocType, HydratedDocument<ProfileDocType>>);
         const orders = await Order.find(query.getFilter());
 
         if (!orders?.length) {
@@ -87,10 +57,17 @@ orderSchema.pre(
         await Promise.all(updateProductsQuantities(products as OrderDocType['products'], true));
     });
 
-orderSchema.pre(
-    [...BULK_UPDATE_OPERATIONS],
-    async function () {
+// We sum up the new quantities of the products from the list and update the `quantity` field on the according products.
+orderSchema.post(
+    [...UPDATE_OPERATIONS, ...BULK_UPDATE_OPERATIONS],
+    async function (doc) {
         const query = (this as Query<ProfileDocType, HydratedDocument<ProfileDocType>>);
+        if (doc?.products) {
+            return Promise.all(updateProductsQuantities(doc?.products as OrderDocType['products'], false));
+        }
+        if (!query.getFilter()) {
+            return;
+        }
         const orders = await Order.find(query.getFilter());
 
         if (!orders?.length) {

@@ -2,9 +2,9 @@ import { model, Schema } from 'mongoose';
 import { WithIdObject } from '../../types/utils/with-id-object';
 
 export type ProductDocType = WithIdObject<{
-    title: string,
-    price: number,
-    quantity: number,
+    title: string;
+    price: number;
+    quantity: number;
 }>
 
 export const productSchema = new Schema({
