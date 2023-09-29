@@ -5,6 +5,7 @@
   "scripts": {
     "start": "npm run serve",
     "serve": "nodemon src/index.ts",
+    "build-ts": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
